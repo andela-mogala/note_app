@@ -41,4 +41,13 @@ class NoteAppController
       puts format("%02d. %s", index + 1, note.title)
     end
   end
+
+  def self.update_note
+    note_id = gets.chomp.to_i
+    title = gets.chomp
+    content = gets.chomp
+    note = Note.find(note_id)
+    note.update(title: title, content: content)
+    puts "Note has been updated!"
+  end
 end

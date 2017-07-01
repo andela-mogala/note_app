@@ -103,4 +103,16 @@ RSpec.describe NoteAppController do
       end
     end
   end
+
+  describe ".update_note" do
+    it "updates the title or/and content of a note" do
+      allow(NoteAppController).to receive(:gets).and_return("1", "New Title", "New Content")
+
+      message = capture_puts { NoteAppController.update_note }
+
+      expect(Note.all[0].title).to eq "New Title"
+      expect(Note.all[0].content).to eq "New Content"
+      expect(message).to eq "Note has been updated!"
+    end
+  end
 end

@@ -25,6 +25,16 @@ RSpec.describe NoteAppController do
 
       expect(response).to eq "Title\n\nContent"
     end
+
+    context "when the note doesn't exist" do
+      it "indicates that the note doesn't exist" do
+        allow(NoteAppController).to receive(:gets).and_return("50")
+
+        message  = capture_puts { NoteAppController.view_note }
+
+        expect(message).to eq "This note doesn't exist!"
+      end
+    end
   end
 
   describe ".delete_note" do
@@ -35,12 +45,31 @@ RSpec.describe NoteAppController do
       expect(Note.all).to eq []
       expect(response).to eq "Note has been deleted"
     end
+
+    context "when the note doesn't exist" do
+      it "indicates that the note doesn't exist" do
+        allow(NoteAppController).to receive(:gets).and_return("50")
+
+        message  = capture_puts { NoteAppController.delete_note }
+
+        expect(message).to eq "This note doesn't exist!"
+      end
+    end
   end
 
   describe ".list_notes" do
     it "displays all note titles with their index position" do
       message = capture_puts { NoteAppController.list_notes }
       expect(message).to include "01. Title"
+    end
+
+    context "when there are no notes" do
+      it "indicates that there are no notes" do
+        Note.destroy_all
+
+        message = capture_puts { NoteAppController.list_notes }
+        expect(message).to eq "Sorry, no notes here!"
+      end
     end
   end
 
@@ -58,6 +87,20 @@ RSpec.describe NoteAppController do
       expect(result).to include("03. Another Story")
       expect(result).not_to include("01. Title")
       expect(result).not_to include("04. Evening Time")
+    end
+
+    context "when there is no match for the query" do
+      it "indicates that no match was found" do
+        allow(NoteAppController).to receive(:gets).and_return("member")
+
+        note_1 = Note.create(title: "Story", content: "A nice story")
+        note_2 = Note.create(title: "Another Story", content: "Random text")
+        note_3 = Note.create(title: "Evening Time", content: "Here is a note")
+
+        result = capture_puts { NoteAppController.search_notes }
+
+        expect(result).to eq "No match found!"
+      end
     end
   end
 end

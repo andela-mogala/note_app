@@ -13,6 +13,7 @@ class NoteAppController
   def self.view_note
     note_id = gets.chomp.to_i
     note = Note.find(note_id)
+    return puts "This note doesn't exist!" unless note
     response = "#{note.title}\n\n#{note.content}"
     puts response
   end
@@ -20,11 +21,13 @@ class NoteAppController
   def self.delete_note
     note_id = gets.chomp.to_i
     note = Note.find(note_id)
+    return puts "This note doesn't exist!" unless note
     note.delete
     puts "Note has been deleted"
   end
 
   def self.list_notes
+    return puts "Sorry, no notes here!" if Note.all.empty?
     Note.all.each_with_index do |note, index|
       puts format("%02d. %s", index + 1, note.title)
     end
@@ -33,7 +36,7 @@ class NoteAppController
   def self.search_notes
     query = gets.chomp
     response = Note.search(query)
-    return puts "No match found" if response.empty?
+    return puts "No match found!" if response.empty?
     response.each do |index, note|
       puts format("%02d. %s", index + 1, note.title)
     end

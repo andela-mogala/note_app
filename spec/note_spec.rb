@@ -1,6 +1,8 @@
 require_relative '../lib/note.rb'
 
 RSpec.describe Note do
+  after(:each) { Note.destroy_all }
+
   describe ".find" do
     it "finds and returns a note" do
       note_1 = Note.create(title: 'First', content: 'First Story')
@@ -8,8 +10,6 @@ RSpec.describe Note do
       note_3 = Note.create(title: 'Third', content: 'Third Story')
 
       expect(Note.find(3)).to eq note_3
-
-      Note.destroy_all
     end
   end
 
@@ -44,8 +44,6 @@ RSpec.describe Note do
       note = Note.create(title: 'Title', content: 'Content')
 
       expect(Note.all.has_value? note).to be true
-
-      Note.destroy_all
     end
   end
 
@@ -55,8 +53,6 @@ RSpec.describe Note do
       note.save
 
       expect(Note.all.has_value? note).to be true
-
-      Note.destroy_all
     end
   end
 
@@ -67,8 +63,6 @@ RSpec.describe Note do
 
       expect(note.title).to eq 'Amazing Grace'
       expect(note.content).to eq 'How sweet the sound'
-
-      Note.destroy_all
     end
   end
 
@@ -80,8 +74,6 @@ RSpec.describe Note do
       note.delete
 
       expect(Note.all.has_value? note).to be false
-
-      Note.destroy_all
     end
   end
 
@@ -94,8 +86,6 @@ RSpec.describe Note do
       expect(Note.all.has_value? note_1).to be true
       expect(Note.all.has_value? note_2).to be true
       expect(Note.all.has_value? note_3).to be true
-
-      Note.destroy_all
     end
   end
 
@@ -108,6 +98,20 @@ RSpec.describe Note do
       response = Note.search("ir")
       expect(response.has_value? note_1).to be true
       expect(response.has_value? note_3).to be true
+    end
+  end
+
+  describe ".destroy_all" do
+    it "clears all notes from memory and resets note count" do
+      note_1 = Note.create(title: 'First', content: 'First Story')
+      note_2 = Note.create(title: 'Second', content: 'Second Story')
+
+      expect(Note.all.size).to eq 2
+
+      Note.destroy_all
+
+      expect(Note.all.empty?).to be true
+      expect(Note.class_variable_get(:@@note_count)).to eq 0
     end
   end
 end

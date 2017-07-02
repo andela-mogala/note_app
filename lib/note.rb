@@ -55,6 +55,6 @@ class Note
 
   def self.destroy_all
     @@notes.clear
-
+    @@note_count = 0
   end
 end

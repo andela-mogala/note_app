@@ -12,16 +12,22 @@ class NoteAppController
   end
 
   def run
+    loop do
+      cmd = view.prompt ""
+      break if cmd =~ /\Aexit/
+      evaluate cmd
+    end
   end
 
   def create_note
-    input_string = view.request "Enter a title and content for your note"
-    Note.create(title: input_string[0], content: input_string[1])
+    title = view.prompt "Enter a title"
+    content = view.prompt "Type your note"
+    Note.create(title: title, content: content)
     view.display "Note has been created"
   end
 
   def view_note
-    note_id = view.request "Enter the note id"
+    note_id = view.prompt "Enter the note id"
     note = Note.find(note_id.to_i)
     return view.display "This note doesn't exist!" unless note
     response = "#{note.title}\n\n#{note.content}"
@@ -29,7 +35,7 @@ class NoteAppController
   end
 
   def delete_note
-    note_id = view.request "Enter the note id"
+    note_id = view.prompt "Enter the note id"
     note = Note.find(note_id.to_i)
     return view.display "This note doesn't exist!" unless note
     note.delete
@@ -42,17 +48,30 @@ class NoteAppController
   end
 
   def search_notes
-    query = view.request "Enter a search string"
+    query = view.prompt "Enter a search string"
     response = Note.search(query)
     return view.display "No match found!" if response.empty?
     view.display_hash response
   end
 
   def update_note
-    note_id = view.request "Enter a note id"
-    title = view.request "Enter the title"
-    content = view.request "Enter your note"
+    note_id = view.prompt "Enter a note id"
+    title = view.prompt "Enter the title"
+    content = view.prompt "Enter your note"
     Note.find(note_id.to_i).update(title: title, content: content)
     view.display "Note has been updated!"
+  end
+
+  private
+
+  def evaluate(cmd)
+    case cmd
+    when "createnote" then create_note
+    when "viewnote" then view_note
+    when "deletenote" then delete_note
+    when "listnotes" then list_notes
+    when "searchnotes" then search_notes
+    else view.display "Unknown command!"
+    end
   end
 end

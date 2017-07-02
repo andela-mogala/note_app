@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/note_app_controller'
+require_relative '../lib/note_app_view'
+
+NoteAppController.new(NoteAppView.new).run

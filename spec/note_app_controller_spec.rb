@@ -11,7 +11,7 @@ RSpec.describe NoteAppController do
 
   describe ".create_note" do
     it "creates a note in memory" do
-      allow(view).to receive(:gets).and_return("Title Content")
+      allow(view).to receive(:gets).and_return("Title", "Content")
 
       message = capture_puts { controller.create_note }
 
@@ -32,7 +32,7 @@ RSpec.describe NoteAppController do
 
     context "when the note doesn't exist" do
       it "indicates that the note doesn't exist" do
-        allow(controller).to receive(:gets).and_return("50")
+        allow(view).to receive(:gets).and_return("50")
 
         message  = capture_puts { controller.view_note }
 
@@ -78,7 +78,7 @@ RSpec.describe NoteAppController do
         Note.destroy_all
 
         message = capture_puts { controller.list_notes }
-        expect(message).to eq "Sorry, no notes here!"
+        expect(message).to include "Sorry, no notes here!"
       end
     end
   end

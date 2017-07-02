@@ -9,7 +9,7 @@ RSpec.describe Note do
       note_2 = Note.create(title: 'Second', content: 'Second Story')
       note_3 = Note.create(title: 'Third', content: 'Third Story')
 
-      expect(Note.find(3)).to eq note_3
+      expect(Note.find(note_3.id)).to eq note_3
     end
   end
 

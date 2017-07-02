@@ -9,17 +9,17 @@ RSpec.describe NoteAppView do
     it "prompts the user and returns a string" do
       allow(view).to receive(:gets).and_return("1")
 
-      message = capture_puts { view.request("Search") }
+      message = capture_puts { view.prompt("Search") }
 
-      expect(message).to eq "Search>> "
-      expect(view.request("Search")).to eq "1"
+      expect(message).to include "Search>> "
+      expect(view.prompt("Search")).to eq "1"
     end
   end
 
   describe "#display" do
     it "prints messages to the console" do
       message = capture_puts { view.display("Note has been deleted!") }
-      expect(message).to eq "Note has been deleted!"
+      expect(message).to include "Note has been deleted!"
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe NoteAppView do
       note_2 = Note.create(title: "Another Story", content: "Random text")
       note_3 = Note.create(title: "Evening Time", content: "Here is a note")
 
-      output = capture_puts { view.display_list(Note.all) }
+      output = capture_puts { view.display_hash(Note.all) }
 
       expect(output).to include "01. Story"
       expect(output).to include "02. Another Story"

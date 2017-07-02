@@ -1,12 +1,13 @@
 class Note
   attr_reader :title, :content, :id
   @@note_count = 0
-  @@notes = []
+  @@notes = {}
 
   def initialize(title:, content:)
     self.title = title
     self.content = content
     @@note_count += 1
+    @id = @@note_count
   end
 
   def title=(title)
@@ -24,11 +25,11 @@ class Note
   end
 
   def self.find(note_id)
-    @@notes[note_id - 1]
+    @@notes[note_id]
   end
 
   def save
-    Note.class_variable_get(:@@notes) << self
+    Note.class_variable_get(:@@notes)[self.id] = self
     self
   end
 
@@ -38,8 +39,7 @@ class Note
   end
 
   def delete
-    Note.class_variable_get(:@@notes)
-      .delete_at(Note.class_variable_get(:@@notes).find_index(self))
+    Note.class_variable_get(:@@notes).delete(self.id)
   end
 
   def self.all
@@ -48,15 +48,13 @@ class Note
 
   def self.search(query)
     response_hash = {}
-    @@notes.each_with_index do |note, index|
-      if note.title =~ /#{query}/i || note.content =~ /#{query}/i
-        response_hash[index] = note
-      end
+    @@notes.select do |index, note|
+      note.title =~ /#{query}/i || note.content =~ /#{query}/i
     end
-    response_hash
   end
 
   def self.destroy_all
-    @@notes= []
+    @@notes.clear
+
   end
 end

@@ -1,5 +1,8 @@
 require_relative "./note.rb"
-
+=begin
+  Consider converting all class methods to instance methods
+  Also make the changes reflect in the tests
+=end
 class NoteAppController
   def run
   end

@@ -9,9 +9,9 @@ class NoteAppView
     puts message
   end
 
-  def display_list(list)
-    list.each_with_index do |note, index|
-      display format("%02d. %s", index + 1, note.title)
+  def display_hash(hash)
+    hash.each do |index, note|
+      display format("%02d. %s", index, note.title)
     end
   end
 end

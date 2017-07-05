@@ -26,30 +26,29 @@ class NoteAppController
     view.display "Note has been created"
   end
 
-  def view_note
-    note_id = view.prompt "Enter the note id"
-    note = Note.find(note_id.to_i)
+  def view_note(id)
+    note = Note.find(id)
     return view.display "This note doesn't exist!" unless note
     response = "#{note.title}\n\n#{note.content}"
     view.display response
   end
 
-  def delete_note
-    note_id = view.prompt "Enter the note id"
-    note = Note.find(note_id.to_i)
+  def delete_note(id)
+    note = Note.find(id)
     return view.display "This note doesn't exist!" unless note
     note.delete
     view.display "Note has been deleted"
   end
 
-  def list_notes
+  def list_notes(size = nil)
     return view.display "Sorry, no notes here!" if Note.all.empty?
+    return view.display_hash Note.all.take(size) if size
     view.display_hash Note.all
   end
 
-  def search_notes
-    query = view.prompt "Enter a search string"
+  def search_notes(query, size = nil)
     response = Note.search(query)
+    response = response.take(size) if size
     return view.display "No match found!" if response.empty?
     view.display_hash response
   end
@@ -67,11 +66,27 @@ class NoteAppController
   def evaluate(cmd)
     case cmd
     when "createnote" then create_note
-    when "viewnote" then view_note
-    when "deletenote" then delete_note
-    when "listnotes" then list_notes
-    when "searchnotes" then search_notes
-    else view.display "Unknown command!"
+    when /\Aviewnote\s\d$/ then view_note cmd.split[1].to_i
+    when /\Adeletenote\s\d$/ then delete_note cmd.split[1].to_i
+    when /\Alistnotes/ then process_list_notes cmd
+    when /\Asearchnotes\s.*$/ then process_search cmd
+    else view.display_error "Unknown command!"
     end
+  end
+
+  def process_search(cmd)
+    keywords = cmd.split
+    return search_notes(keywords[1]) if keywords.size == 2
+    return view.display_error 'Invalid Command!' if keywords.size < 4 && \
+    (keywords[2] != "--limit" || keywords[2] != "-l")
+    search_notes(keywords[1], keywords[3].to_i)
+  end
+
+  def process_list_notes(cmd)
+    keywords = cmd.split
+    return list_notes if keywords.size == 1
+    return view.display_error 'Invalid Command!' if keywords.size < 3 && \
+    (keywords[1] != "--limit" || keywords[1] !="-l")
+    return list_notes keywords[2].to_i if keywords.size == 3
   end
 end

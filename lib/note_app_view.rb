@@ -6,6 +6,9 @@ class NoteAppView
     puts message.colorize color: :black, background: :white
   end
 
+  def display_error(message)
+    puts message.colorize :red
+  end
   def display_hash(hash)
     hash.each do |index, note|
       display format("%02d. %s", index, note.title)

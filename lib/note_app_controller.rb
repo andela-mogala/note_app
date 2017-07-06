@@ -53,6 +53,7 @@ class NoteAppController
     view.display_hash response
   end
 
+  # I have not decided how best to implement this yet so I'm putting it on hold
   def update_note
     note_id = view.prompt "Enter a note id"
     title = view.prompt "Enter the title"

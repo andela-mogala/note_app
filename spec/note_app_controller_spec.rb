@@ -23,18 +23,14 @@ RSpec.describe NoteAppController do
 
   describe ".view_note" do
     it "displays the title and content of a note" do
-      allow(view).to receive(:gets).and_return("1")
-
-      response = capture_puts { controller.view_note }
+      response = capture_puts { controller.view_note 1 }
 
       expect(response).to include "Title\n\nContent"
     end
 
     context "when the note doesn't exist" do
       it "indicates that the note doesn't exist" do
-        allow(view).to receive(:gets).and_return("50")
-
-        message  = capture_puts { controller.view_note }
+        message  = capture_puts { controller.view_note 50 }
 
         expect(message).to include "This note doesn't exist!"
       end
@@ -43,18 +39,15 @@ RSpec.describe NoteAppController do
 
   describe ".delete_note" do
     it "removes a note from memory" do
-      allow(view).to receive(:gets).and_return("1")
+      response = capture_puts { controller.delete_note(1) }
 
-      response = capture_puts { controller.delete_note }
       expect(Note.all.has_value? @note).to be false
       expect(response).to include "Note has been deleted"
     end
 
     context "when the note doesn't exist" do
       it "indicates that the note doesn't exist" do
-        allow(view).to receive(:gets).and_return("50")
-
-        message  = capture_puts { controller.delete_note }
+        message  = capture_puts { controller.delete_note 50 }
 
         expect(message).to include "This note doesn't exist!"
       end
@@ -85,35 +78,50 @@ RSpec.describe NoteAppController do
 
   describe ".search_notes" do
     it "returns the index and titles of notes that contain the search query" do
-      allow(view).to receive(:gets).and_return("story")
-
       note_1 = Note.create(title: "Story", content: "A nice story")
       note_2 = Note.create(title: "Another Story", content: "Random text")
       note_3 = Note.create(title: "Evening Time", content: "Here is a note")
 
-      result = capture_puts { controller.search_notes }
+      result = capture_puts { controller.search_notes "story" }
 
       expect(result).to include("02. Story")
       expect(result).to include("03. Another Story")
       expect(result).not_to include("01. Title")
       expect(result).not_to include("04. Evening Time")
+
+      Note.destroy_all
     end
 
     context "when there is no match for the query" do
       it "indicates that no match was found" do
-        allow(view).to receive(:gets).and_return("member")
-
         note_1 = Note.create(title: "Story", content: "A nice story")
         note_2 = Note.create(title: "Another Story", content: "Random text")
         note_3 = Note.create(title: "Evening Time", content: "Here is a note")
 
-        result = capture_puts { controller.search_notes }
+        result = capture_puts { controller.search_notes "member" }
 
         expect(result).to include "No match found!"
+
+        Note.destroy_all
+      end
+    end
+
+    context "when a limit is specified" do
+      it "returns the exact number of results matching the limit size" do
+        note_1 = Note.create(title: "Story", content: "A nice story")
+        note_2 = Note.create(title: "Another Story", content: "Random text")
+        note_3 = Note.create(title: "Evening Time", content: "Here is a note")
+
+        result = capture_puts { controller.search_notes "story", 1 }
+
+        expect(result).to include "Story"
+        expect(result).not_to include "Another Story"
+        expect(result).not_to include "Evening Time"
       end
     end
   end
 
+  # I will revisit these tests when I have decided how to implement the controller method
   describe ".update_note" do
     it "updates the title or/and content of a note" do
       allow(view).to receive(:gets).and_return("1", "New Title", "New Content")

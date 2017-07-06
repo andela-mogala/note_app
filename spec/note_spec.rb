@@ -111,7 +111,7 @@ RSpec.describe Note do
       Note.destroy_all
 
       expect(Note.all.empty?).to be true
-      expect(Note.class_variable_get(:@@note_count)).to eq 0
+      expect(Note.note_count).to eq 0
     end
   end
 end

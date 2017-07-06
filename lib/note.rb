@@ -1,13 +1,43 @@
 class Note
+  @note_count = 0
+  @notes = {}
+
+  class << self
+    attr_accessor :note_count, :notes
+
+    def create(title:, content:)
+      Note.new(title: title, content: content).save
+    end
+
+    def find(note_id)
+      notes[note_id]
+    end
+
+    def search(query)
+      response_hash = {}
+      notes.select do |index, note|
+        note.title =~ /#{query}/i || note.content =~ /#{query}/i
+      end
+    end
+
+    def all
+      notes
+    end
+
+    def destroy_all
+      @notes.clear
+      @note_count = 0
+    end
+  end
+
   attr_reader :title, :content, :id
-  @@note_count = 0
-  @@notes = {}
+
 
   def initialize(title:, content:)
     self.title = title
     self.content = content
-    @@note_count += 1
-    @id = @@note_count
+    Note.note_count += 1
+    @id = Note.note_count
   end
 
   def title=(title)
@@ -20,17 +50,8 @@ class Note
     @content  = content
   end
 
-  def self.create(title:, content:)
-    new(title: title, content: content).save
-  end
-
-  def self.find(note_id)
-    @@notes[note_id]
-  end
-
   def save
-    Note.class_variable_get(:@@notes)[self.id] = self
-    self
+    Note.notes[self.id] = self
   end
 
   def update(title: nil, content: nil)
@@ -39,22 +60,6 @@ class Note
   end
 
   def delete
-    Note.class_variable_get(:@@notes).delete(self.id)
-  end
-
-  def self.all
-    @@notes
-  end
-
-  def self.search(query)
-    response_hash = {}
-    @@notes.select do |index, note|
-      note.title =~ /#{query}/i || note.content =~ /#{query}/i
-    end
-  end
-
-  def self.destroy_all
-    @@notes.clear
-    @@note_count = 0
+    Note.notes.delete(self.id)
   end
 end
